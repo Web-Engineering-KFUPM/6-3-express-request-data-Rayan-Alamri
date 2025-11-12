@@ -107,6 +107,10 @@ LAB SETUP INSTRUCTIONS
 import express from "express";
 const app = express();
 
+app.get("/", (req, res) => {
+  res.json({ ok: true, message: "API running" });
+});
+
 
 // create server
 app.listen(3000, () => console.log("API running at http://localhost:3000"));
