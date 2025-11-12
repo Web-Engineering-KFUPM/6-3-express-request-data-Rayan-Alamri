@@ -109,18 +109,51 @@ const app = express();
 
 
 // create server
+app.listen(3000, () => console.log("API running at http://localhost:3000"));
 
 
 // Query params: /echo?name=Ali&age=22
-
+app.get("/echo", (req, res) => {
+const { name, age } = req.query;
+   if (!name || !age) {
+      return res.status(400).json({ ok: false, error: "name & age required" });
+   }
+   res.json({ ok: true, name, age, msg: `Hello ${name}, you are ${age}` });
+});
 
 // Route params: /profile/First/Last
+app.get("/profile/:first/:last", (req, res) => {
+   const { first, last } = req.params;
+   res.json({ ok: true, fullName: `${first} ${last}` });
+});
 
+// Param middleware: userId
+app.param("userId", (req, res, next, userId) => {
+   const userIdNum = Number(userId);
+   if (isNaN(userIdNum) || userIdNum <= 0) {
+      return res.status(400).json({ ok: false, error: "userId must be positive number" });
+   }
+   req.userIdNum = userIdNum;
+   next();
+});
 
 // Route param middleware example: /users/42
+app.param("userId", (req, res, next, userId) => {
+   const userIdNum = Number(userId);
 
+   if (isNaN(userIdNum) || userIdNum <= 0) {
+      return res.status(400).json({ ok: false, error: "userId must be positive number" });
+   } else {
+      req.userIdNum = userIdNum;
+      next();
+   }
+});
 
 // Route params: /users/:userId route
+app.get("/users/:userId", (req, res) => {
+   // req.userIdNum is set by the app.param("userId", ...) middleware above
+   res.json({ ok: true, userId: req.userIdNum });
+});
 
 
 
